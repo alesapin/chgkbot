@@ -1,0 +1,2 @@
+# chgkbot
+Bot for chgkdb
