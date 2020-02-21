@@ -1,9 +1,9 @@
 import pymorphy2
-#from Levenshtein import distance
 from enum import Enum
 import re
-import logging
+
 GROUPING_SPACE_REGEX = re.compile('([^\w_-]|[+])', re.U)
+
 
 class ComparisonResult(Enum):
     EQUAL = 1
@@ -27,9 +27,6 @@ class AnswersComporator(object):
             else:
                 return ComparisonResult.NON_EQUAL
 
-        #if distance(correct_answer, proposed_answer) <= self.norm_dist:
-        #    return ComparisonResult.ALMOST_EQUAL
-
         correct_tokenized = self._tokenize(correct_answer)
         proposed_tokenized = self._tokenize(proposed_answer)
 
@@ -41,8 +38,5 @@ class AnswersComporator(object):
 
         if correct_lemmatized == proposed_lemmatized:
             return ComparisonResult.ALMOST_EQUAL
-
-        #if distance(' '.join(correct_lemmatized), ' '.join(proposed_lemmatized)) <= self.lemma_dist:
-        #    return ComparisonResult.ALMOST_EQUAL
 
         return ComparisonResult.NON_EQUAL
