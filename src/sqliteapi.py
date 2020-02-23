@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import sqlite3
-from question import Question, difficulty_to_string
 import datetime
 import time
+
+from question import Question, difficulty_to_string
 
 
 class SQLiteAPI(object):
@@ -37,12 +40,11 @@ class SQLiteAPI(object):
 
         self.conn.commit()
 
-    def store_new_question(self, question, chat_id, trusted=0):
+    def store_new_question(self, question, trusted=0):
         c = self.conn.cursor()
         c.execute(f"INSERT INTO questions VALUES({question.qid}, '{question.text}', '{question.answer}', '{question.comment}', '{question.tournament_title}', '{difficulty_to_string(question.difficulty)}', {question.rating}, {trusted})")
-
-        c.execute(f"INSERT INTO answers (chat_id, qid) VALUES ({chat_id}, {question.qid})")
         self.conn.commit()
+
 
     def get_question(self, qid):
         c = self.conn.cursor()
@@ -53,7 +55,7 @@ class SQLiteAPI(object):
     def start_question(self, qid, chat_id):
         c = self.conn.cursor()
         start = int(time.time())
-        c.execute(f"UPDATE answers SET start_time = {start} WHERE qid = ? and chat_id = ?", (qid, chat_id))
+        c.execute(f"INSERT OR IGNORE INTO answers (chat_id, qid, start_time) VALUES ({chat_id}, {qid}, {start})")
         self.conn.commit()
 
     def wrong_answer_question(self, qid, chat_id):
@@ -84,10 +86,14 @@ class SQLiteAPI(object):
 
     def get_trusted_question(self, chat_id, trusted):
         c = self.conn.cursor()
-        c.execute("SELECT qid, body, answer, comment, tournament_title, difficulty, rating FROM questions INNER JOIN answers USING (qid) WHERE chat_id = ? AND answered = 0 and trusted = ?", (chat_id, int(trusted)))
-        row = c.fetchone()
-        if not row:
+        print("Chat id:", chat_id, "trusted:", trusted)
+        c.execute("select  qid, body, answer, comment, tournament_title, difficulty, rating FROM questions where qid not in (select distinct qid from answers where chat_id = ? and answered = 1) and trusted = ? limit 1;", (chat_id, int(trusted)))
+        rows = c.fetchall()
+        if len(rows) == 0:
+            print("ZERO ROWS")
             raise Exception("Cannot find any not already answered question")
+        row = rows[0]
+        print("ROW:", row, "Len:", len(row))
         return Question(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
     def get_answer_stats(self, qid, chat_id):

@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 from question import Question, QuestionDifficulty
 import requests
 import logging

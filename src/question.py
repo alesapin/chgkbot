@@ -1,6 +1,8 @@
-import hashlib
+# -*- coding: utf-8 -*-
+
 import string
 from enum import IntEnum
+
 
 class QuestionDifficulty(IntEnum):
     UNKNOWN = 0
@@ -9,6 +11,7 @@ class QuestionDifficulty(IntEnum):
     MEDIUM = 3
     DIFFICULT = 4
     COFFIN = 5
+
 
 def difficulty_to_string(value):
     if value == QuestionDifficulty.TRIVIAL:
@@ -56,7 +59,7 @@ class Question(object):
                f"Tournament: {self.tournament_title}"
 
 def format_answer(q):
-    return f"Правильный ответ: *{q.answer}*\nКомментарий: {q.comment}\nТурнир: {q.tournament_title}"
+    return f"Правильный ответ: *{q.answer}*\nКомментарий: {q.comment}\nИсточник: {q.tournament_title}"
 
 
 def format_question(q):
