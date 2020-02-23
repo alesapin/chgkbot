@@ -39,9 +39,7 @@ def ask_question(update, context):
         trusted = False
     querist = Querist(DBPATH)
     try:
-        print("LOOKING for question")
         question = querist.get_question_for(update.effective_chat.id, trusted)
-        print("Question", question)
         question_text = format_question(question)
     except Exception as ex:
         logging.info("Exception looking for question: %s", str(ex))

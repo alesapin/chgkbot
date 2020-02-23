@@ -86,14 +86,11 @@ class SQLiteAPI(object):
 
     def get_trusted_question(self, chat_id, trusted):
         c = self.conn.cursor()
-        print("Chat id:", chat_id, "trusted:", trusted)
         c.execute("select  qid, body, answer, comment, tournament_title, difficulty, rating FROM questions where qid not in (select distinct qid from answers where chat_id = ? and answered = 1) and trusted = ? limit 1;", (chat_id, int(trusted)))
         rows = c.fetchall()
         if len(rows) == 0:
-            print("ZERO ROWS")
             raise Exception("Cannot find any not already answered question")
         row = rows[0]
-        print("ROW:", row, "Len:", len(row))
         return Question(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
     def get_answer_stats(self, qid, chat_id):
